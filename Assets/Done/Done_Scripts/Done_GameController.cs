@@ -26,13 +26,17 @@ public class Done_GameController : MonoBehaviour
     private bool gamestartModel2=false;
     private bool gameselect=false;
 
+    private bool gameReset = false;
+//
+    public static bool practiceModel = false;
+
 	void Start ()
 	{
         //游戏在这里开始；
         //
         gameOver = false;
 		restart = false;
-		restartText.text = "1:简单  2.中等  3.困难  4.练习模式";
+		restartText.text = "1:生存模式 2.练习模式";
 		gameOverText.text = "";
         scoreText.text = "";
         score = 0;
@@ -40,55 +44,48 @@ public class Done_GameController : MonoBehaviour
         Miss = 0;
 
 		gameselect = true;
-	//	UpdateScore ();
-	//	StartCoroutine (SpawnWaves ());
-	//	Client.GetInstance();
-	}
+//
+        practiceModel = false;
+        //	UpdateScore ();
+        //	StartCoroutine (SpawnWaves ());
+        //	Client.GetInstance();
+    }
 
     void Update ()
 	{
 		if (gameselect) {
-            if (Input.GetKeyDown(KeyCode.Alpha1))
-            {
-                Done_Mover_asteroid.asteroidSpeed = -1;
-                Done_Mover_enemy.enemySpeed = -2 ;
-                //hazardCount = 3;
-                waveWait = 4;
+            if (Input.GetKeyDown(KeyCode.Alpha1)) {
+                gameselect = false;
+                Done_Mover_asteroid.asteroidSpeed = (-1) * (AdjustSpeed.SpeedSliderValue);
+                Done_Mover_enemy.enemySpeed = (-1) * (AdjustSpeed.SpeedSliderValue) - 1;
+                hazardCount = AdjustSpeed.HardSliderValue;
+
+                waveWait = 6 - AdjustSpeed.SpeedSliderValue;
                 gamestartModel1 = true;
             }
-            else if (Input.GetKeyDown(KeyCode.Alpha2)|| Input.GetKeyDown(KeyCode.R))
-            {
-                Done_Mover_asteroid.asteroidSpeed = -3;
-                Done_Mover_enemy.enemySpeed = -4;
-                //hazardCount = 7;
-                waveWait = 2;
-                gamestartModel1 = true;
-            }
-            else if (Input.GetKeyDown(KeyCode.Alpha3))
-            {
-                Done_Mover_asteroid.asteroidSpeed = -5;
-                Done_Mover_enemy.enemySpeed = -6;
-                //hazardCount = 10;
-                waveWait = 1;
-                gamestartModel1 = true;
-            }
-            else if (Input.GetKeyDown(KeyCode.Alpha4))
-            {
-                Done_Mover_asteroid.asteroidSpeed = -3;
-                Done_Mover_enemy.enemySpeed = -4;
-                waveWait = 2;
+            
+           
+            else if (Input.GetKeyDown(KeyCode.Alpha2)){
+                gameselect = false;
+                Done_Mover_asteroid.asteroidSpeed = (-1) * (AdjustSpeed.SpeedSliderValue);
+                Done_Mover_enemy.enemySpeed = (-1) * (AdjustSpeed.SpeedSliderValue) - 1;
+                waveWait = 6 - AdjustSpeed.SpeedSliderValue;
                 gamestartModel2 = true;
             }
 
             if (gamestartModel1) {
+                gameReset = true;
                 gamestartModel1 = false;
                 restartText.text = "";
                 UpdateScore();
                 StartCoroutine(SpawnWaves());
                 Client.GetInstance();         
             }
-            if (gamestartModel2)
-            {
+            if (gamestartModel2){
+                //
+                practiceModel = true;
+
+                gameReset = true;
                 gamestartModel2 = false;
                 restartText.text = "";
                 UpdateScore();
@@ -97,7 +94,7 @@ public class Done_GameController : MonoBehaviour
             }
         }
 
-		if (restart)
+		if (restart||gameReset)
 		{
 			if (Input.GetKeyDown (KeyCode.R))
  			{
@@ -155,14 +152,14 @@ public class Done_GameController : MonoBehaviour
 		yield return new WaitForSeconds (startWait);
 		while (true)
 		{
-//			for (int i = 0; i < hazardCount; i++)
-//			{
+			for (int i = 0; i < hazardCount; i++)
+			{
 				GameObject hazard = hazards [Random.Range (0, hazards.Length)];
 				Vector3 spawnPosition = new Vector3 (Random.Range (-spawnValues.x, spawnValues.x), spawnValues.y, spawnValues.z);
 				Quaternion spawnRotation = Quaternion.identity;
 				Instantiate (hazard, spawnPosition, spawnRotation);
-//				yield return new WaitForSeconds (spawnWait);
-//			}
+				yield return new WaitForSeconds (0.75f);
+			}
 			yield return new WaitForSeconds (waveWait);
 			
 			if (gameOver)
@@ -191,7 +188,7 @@ public class Done_GameController : MonoBehaviour
 
 	void UpdateScore ()
 	{
-		scoreText.text =  "总数 :" +Total + "    失误:" +Miss +  "        分数: " + score;
+		scoreText.text =  "总数 :" +Total + "  失误:" +Miss + "  分数: " + score + "  按R重置游戏";
     }
 	
 	public void GameOver ()
@@ -199,4 +196,12 @@ public class Done_GameController : MonoBehaviour
 		gameOverText.text = "游戏结束!";
 		gameOver = true;
 	}
+
+    void OnApplicationQuit()
+    {
+        Client.GetInstance().Destroy();
+        Application.Quit();
+    }
+
+
 }

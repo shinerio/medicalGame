@@ -1,10 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-//
-//using System.Threading;
-//
-
 [System.Serializable]
 public class Done_Boundary 
 {
@@ -30,14 +26,24 @@ public class Done_PlayerController : MonoBehaviour
 	public float fireRate;
 	 
 	private float nextFire;
+
+    //
+    private bool openFire = false;
 	
 	void Update ()
 	{
-		if (Time.time > nextFire) 
-		//if (Input.GetButton("Fire1") && Time.time > nextFire) 
+        if (Done_GameController.practiceModel) {
+            if (openFire && Time.time > nextFire) {
+                openFire = false;
+                nextFire = Time.time + fireRate;
+                Instantiate(shot, shotSpawn.position, shotSpawn.rotation);
+                GetComponent<AudioSource>().Play();
+            }
+        }
+		else if(Time.time > nextFire) 
+		//if (Input.GetButton("Fire1") && Time.time > nextFire)
 		{
 			nextFire = Time.time + fireRate;
-
 			Instantiate(shot, shotSpawn.position, shotSpawn.rotation);
 			GetComponent<AudioSource>().Play ();
 		}
@@ -59,8 +65,10 @@ public class Done_PlayerController : MonoBehaviour
 			0.0f, 
 			Mathf.Clamp (GetComponent<Rigidbody>().position.z, boundary.zMin, boundary.zMax)
 		);
-		
-		
+//
+        if ( ((GetComponent<Rigidbody>().position.x < 0.3)&&(GetComponent<Rigidbody>().position.x >-0.3))  || (GetComponent<Rigidbody>().position.x == 6) || (GetComponent<Rigidbody>().position.x == -6)) {
+            openFire = true;
+        }
 		
 		
 		GetComponent<Rigidbody>().rotation = Quaternion.Euler (0.0f, 0.0f, GetComponent<Rigidbody>().velocity.x * -tilt);
