@@ -11,11 +11,11 @@ public class AdjustSpeed : MonoBehaviour
     Rect windowRect;
     int windowSwitch = 0;
     float alpha = 0;
-    public float hSpeedSliderValue = 2.0F;
-    public static int SpeedSliderValue = 2;
+    public float hSpeedSliderValue = 0F;
+    public static int SpeedSliderValue = 0;
 
-    public float hHardSliderValue = 2.0F;
-    public static int HardSliderValue = 2;
+    public float hHardSliderValue = 0F;
+    public static int HardSliderValue = 0;
 
     void GUIAlphaColor_0_To_1()
     {
